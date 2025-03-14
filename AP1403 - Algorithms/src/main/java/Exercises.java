@@ -1,3 +1,6 @@
+import java.util.Arrays;
+
+
 public class Exercises {
 
     /*
@@ -9,7 +12,30 @@ public class Exercises {
         note: you should return the indices in ascending order and every array's solution is unique
     */
     public int[] productIndices(int[] values, int target) {
-        // todo
+        int n = values.length;
+        int[][] indexedNums = new int[n][2];
+
+        for (int i = 0; i < n; i++) {
+            indexedNums[i][0] = values[i];
+            indexedNums[i][1] = i;
+        }
+
+        Arrays.sort(indexedNums, (a, b) -> Integer.compare(a[0], b[0]));
+
+        int left = 0, right = n - 1;
+        while (left < right) {
+            int product = indexedNums[left][0] * indexedNums[right][0];
+
+            if (product == target) {
+                int idx1 = indexedNums[left][1], idx2 = indexedNums[right][1];
+                return new int[]{Math.min(idx1, idx2), Math.max(idx1, idx2)};
+            } else if (product < target) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+
         return null;
     }
 
@@ -25,8 +51,37 @@ public class Exercises {
         so you should walk in that matrix in a curl and then add the numbers in order you've seen them in a 1D array
     */
     public int[] spiralTraversal(int[][] values, int rows, int cols) {
-        // todo
-        return null;
+        int top = 0, bottom = rows - 1, left = 0, right = cols - 1;
+        int[] res = new int[rows * cols];
+        int index = 0;
+
+        while (left <= right && top <= bottom) {
+            for (int i = left; i <= right; i++) {
+                res[index++] = values[top][i];
+            }
+            top++;
+
+            for (int i = top; i <= bottom; i++) {
+                res[index++] = values[i][right];
+            }
+            right--;
+
+            if (top <= bottom) {
+                for (int i = right; i >= left; i--) {
+                    res[index++] = values[bottom][i];
+                }
+                bottom--;
+            }
+
+            if (left <= right) {
+                for (int i = bottom; i >= top; i--) {
+                    res[index++] = values[i][left];
+                }
+                left++;
+            }
+        }
+
+        return res;
     }
 
     /*
@@ -54,8 +109,38 @@ public class Exercises {
         if you're familiar with lists and arraylists, you can also edit method's body to use them instead of array
     */
     public int[][] intPartitions(int n) {
-        // todo
-        return null;
+        int maxPartitions = countPartitions(n, n);
+        int[][] result = new int[maxPartitions][];
+
+        int[] partition = new int[n];
+        int index = 0;
+
+        storePartitions(n, n, partition, 0, result, new int[]{0});
+        return result;
+    }
+
+    static void storePartitions(int n, int max, int[] partition, int partitionSize, int[][] result, int[] index) {
+        if (n == 0) {
+            result[index[0]] = new int[partitionSize];
+            System.arraycopy(partition, 0, result[index[0]], 0, partitionSize);
+            index[0]++;
+            return;
+        }
+
+        for (int i = Math.min(max, n); i >= 1; i--) {
+            partition[partitionSize] = i;
+            storePartitions(n - i, i, partition, partitionSize + 1, result, index);
+        }
+    }
+
+    static int countPartitions(int n, int max) {
+        if (n == 0) return 1;
+
+        int count = 0;
+        for (int i = Math.min(max, n); i >= 1; i--) {
+            count += countPartitions(n - i, i);
+        }
+        return count;
     }
 
     public static void main(String[] args) {
